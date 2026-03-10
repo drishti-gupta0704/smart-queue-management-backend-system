@@ -23,6 +23,11 @@ app.use("/api/users", userRoutes);
 app.use("/api/queues", queueRoutes);
 app.use("/api/tickets", ticketRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Server is running!");
+});
+
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });

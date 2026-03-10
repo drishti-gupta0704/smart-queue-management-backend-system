@@ -1,7 +1,6 @@
 
 const Ticket = require("../models/Ticket");
-const { joinQueueService } = require("../services/queueService");
-const { getQueuePosition } = require("../services/ticketService");
+const { joinQueueService, getQueuePosition } = require("../services/ticketService");
 
 // JOIN QUEUE
 const joinQueue = async (req, res) => {
