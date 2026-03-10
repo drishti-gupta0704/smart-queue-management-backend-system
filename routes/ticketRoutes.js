@@ -1,19 +1,46 @@
 
 const express = require("express");
 const router = express.Router();
+const { body, param } = require("express-validator");
 
+const protect = require("../middleware/authMiddleware");
+const isAdmin = require("../middleware/roleMiddleware");
 const {
   joinQueue,
   getPosition,
-  cancelTicket
+  cancelTicket,
+  getAllTickets,
+  getMyTickets
 } = require("../controllers/ticketController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+// JOIN QUEUE
+router.post(
+  "/join",
+  protect,
+  body("queueId", "Queue ID is required").notEmpty(),
+  joinQueue
+);
 
-router.post("/join", authMiddleware, joinQueue);
+// GET QUEUE POSITION
+router.get(
+  "/position/:queueId",
+  protect,
+  param("queueId", "Queue ID is required").notEmpty(),
+  getPosition
+);
 
-router.get("/position/:queueId", authMiddleware, getPosition);
+// CANCEL TICKET
+router.delete(
+  "/cancel/:ticketId",
+  protect,
+  param("ticketId", "Ticket ID is required").notEmpty(),
+  cancelTicket
+);
 
-router.delete("/cancel/:ticketId", authMiddleware, cancelTicket);
+// USER: Get my tickets
+router.get("/my-tickets", protect, getMyTickets);
+
+// ADMIN: Get all tickets
+router.get("/all", protect, isAdmin, getAllTickets);
 
 module.exports = router;
