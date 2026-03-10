@@ -26,10 +26,10 @@ const ticketSchema = new mongoose.Schema(
       default: "waiting"
     },
 
-    priority: {
-      type: Boolean,
-      default: false
-    },
+   priority: {
+   type: Number,
+   default: 0
+   },
 
     joinedAt: {
       type: Date,
