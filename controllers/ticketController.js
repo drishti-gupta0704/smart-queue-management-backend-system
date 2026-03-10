@@ -1,7 +1,6 @@
 
 const Ticket = require("../models/Ticket");
-const Queue = require("../models/Queue");
-const { generateToken } = require("../services/queueService");
+const { joinQueueService } = require("../services/queueService");
 const { getQueuePosition } = require("../services/ticketService");
 
 // JOIN QUEUE
@@ -9,27 +8,20 @@ const joinQueue = async (req, res) => {
 
   try {
 
-    const { queueId, priority } = req.body;
+    const { queueId } = req.body;
 
-    const queue = await Queue.findById(queueId);
+    const ticket = await joinQueueService(req.user._id, queueId);
 
-    if (!queue) {
-      return res.status(404).json({ message: "Queue not found" });
-    }
-
-    const tokenNumber = await generateToken(queueId);
-
-    const ticket = await Ticket.create({
-    user: req.user._id,
-    queue: queueId,
-    tokenNumber
+    res.status(201).json({
+      message: "Joined queue successfully",
+      ticket
     });
-
-    res.status(201).json(ticket);
 
   } catch (error) {
 
-    res.status(500).json({ message: error.message });
+    res.status(400).json({
+      message: error.message
+    });
 
   }
 
@@ -46,14 +38,18 @@ const getPosition = async (req, res) => {
     const data = await getQueuePosition(queueId, req.user._id);
 
     if (!data) {
-      return res.status(404).json({ message: "Ticket not found" });
+      return res.status(404).json({
+        message: "Ticket not found"
+      });
     }
 
-    res.json(data);
+    res.status(200).json(data);
 
   } catch (error) {
 
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message
+    });
 
   }
 
@@ -73,11 +69,22 @@ const cancelTicket = async (req, res) => {
       { new: true }
     );
 
-    res.json(ticket);
+    if (!ticket) {
+      return res.status(404).json({
+        message: "Ticket not found"
+      });
+    }
+
+    res.status(200).json({
+      message: "Ticket cancelled successfully",
+      ticket
+    });
 
   } catch (error) {
 
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message
+    });
 
   }
 
