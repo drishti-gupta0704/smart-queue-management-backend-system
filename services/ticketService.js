@@ -5,15 +5,15 @@ const Queue = require("../models/Queue");
 const getQueuePosition = async (queueId, userId) => {
 
   const ticket = await Ticket.findOne({
-    queueId,
-    userId,
+    queue: queueId,
+    user: userId,
     status: "waiting"
   });
 
   if (!ticket) return null;
 
   const peopleAhead = await Ticket.countDocuments({
-    queueId,
+    queue: queueId,
     tokenNumber: { $lt: ticket.tokenNumber },
     status: "waiting"
   });

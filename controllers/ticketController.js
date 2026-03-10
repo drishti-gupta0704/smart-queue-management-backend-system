@@ -20,10 +20,9 @@ const joinQueue = async (req, res) => {
     const tokenNumber = await generateToken(queueId);
 
     const ticket = await Ticket.create({
-      userId: req.user._id,
-      queueId,
-      tokenNumber,
-      priority: priority || 0
+    user: req.user._id,
+    queue: queueId,
+    tokenNumber
     });
 
     res.status(201).json(ticket);
