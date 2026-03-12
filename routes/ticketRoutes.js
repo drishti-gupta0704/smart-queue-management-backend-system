@@ -19,22 +19,26 @@ const {
   updateTicketStatusValidation
 } = require("../validation/ticketValidation");
 
-// JOIN QUEUE
+// USER ROUTES
+
+// Join a queue
 router.post("/join", protect, joinQueueValidation, joinQueue);
 
-// GET QUEUE POSITION
+// Get my position in a queue
 router.get("/position/:queueId", protect, getPosition);
 
-// CANCEL TICKET
+// Cancel my ticket
 router.delete("/cancel/:ticketId", protect, cancelTicket);
 
-// USER: Get my tickets
+// Get all tickets of logged-in user
 router.get("/my-tickets", protect, getMyTickets);
 
-// ADMIN: Get all tickets
+// ADMIN ROUTES
+
+// Get all tickets in the system
 router.get("/all", protect, isAdmin, getAllTickets);
 
-// ADMIN: Update ticket status
+// Update ticket status (serving, completed, cancelled)
 router.patch(
   "/:ticketId/status",
   protect,
