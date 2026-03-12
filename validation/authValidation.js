@@ -13,7 +13,6 @@ const registerValidation = [
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
-  // middleware to handle validation result
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
