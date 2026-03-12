@@ -1,8 +1,15 @@
 
-const Ticket = require("../models/Ticket");
-const { joinQueueService, getQueuePosition } = require("../services/ticketService");
+const {
+  joinQueueService,
+  getQueuePosition,
+  getUserTicketsService,
+  getTicketsByQueueService,
+  updateTicketStatusService
+} = require("../services/ticketService");
 
-// JOIN QUEUE (user)
+// User APIs  //
+
+// JOIN QUEUE (User)
 const joinQueue = async (req, res) => {
   try {
     const { queueId } = req.body;
@@ -17,7 +24,7 @@ const joinQueue = async (req, res) => {
   }
 };
 
-// GET QUEUE POSITION (user)
+// GET QUEUE POSITION (User)
 const getPosition = async (req, res) => {
   try {
     const { queueId } = req.params;
@@ -31,34 +38,40 @@ const getPosition = async (req, res) => {
   }
 };
 
-// CANCEL TICKET (user)
+// CANCEL TICKET (User)
 const cancelTicket = async (req, res) => {
   try {
     const { ticketId } = req.params;
-    const ticket = await Ticket.findByIdAndUpdate(
-      ticketId,
-      { status: "cancelled" },
-      { new: true }
-    );
-
-    if (!ticket) return res.status(404).json({ message: "Ticket not found" });
+    const ticket = await updateTicketStatusService(ticketId, "cancelled");
 
     res.status(200).json({
       message: "Ticket cancelled successfully",
       ticket
     });
   } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// GET ALL TICKETS OF LOGGED-IN USER
+const getMyTickets = async (req, res) => {
+  try {
+    const tickets = await getUserTicketsService(req.user._id);
+    res.status(200).json({ tickets });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//  Admin / User APIs 
+// Admin APIs //
 
 // GET ALL TICKETS IN A QUEUE (Admin)
-const getTicketsByQueue = async (req, res) => {
+const getAllTickets = async (req, res) => {
   try {
-    const { queueId } = req.params;
-    const tickets = await Ticket.find({ queue: queueId }).populate("user", "name email");
+    const { queueId } = req.query;
+    if (!queueId) return res.status(400).json({ message: "Queue ID is required" });
+
+    const tickets = await getTicketsByQueueService(queueId);
     res.status(200).json({ tickets });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,30 +84,14 @@ const updateTicketStatus = async (req, res) => {
     const { ticketId } = req.params;
     const { status } = req.body;
 
-    const ticket = await Ticket.findByIdAndUpdate(
-      ticketId,
-      { status },
-      { new: true }
-    );
-
-    if (!ticket) return res.status(404).json({ message: "Ticket not found" });
+    const ticket = await updateTicketStatusService(ticketId, status);
 
     res.status(200).json({
       message: "Ticket status updated successfully",
       ticket
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// GET ALL TICKETS OF LOGGED-IN USER
-const getUserTickets = async (req, res) => {
-  try {
-    const tickets = await Ticket.find({ user: req.user._id }).populate("queue", "name location");
-    res.status(200).json({ tickets });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -102,7 +99,7 @@ module.exports = {
   joinQueue,
   getPosition,
   cancelTicket,
-  getTicketsByQueue,
-  updateTicketStatus,
-  getUserTickets
+  getMyTickets,
+  getAllTickets,
+  updateTicketStatus
 };
