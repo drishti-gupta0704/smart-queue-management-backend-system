@@ -1,4 +1,5 @@
 
+// routes/ticketRoutes.js
 const express = require("express");
 const router = express.Router();
 
@@ -9,8 +10,8 @@ const {
   joinQueue,
   getPosition,
   cancelTicket,
-  getAllTickets,
   getMyTickets,
+  getAllTickets,
   updateTicketStatus
 } = require("../controllers/ticketController");
 
@@ -19,26 +20,27 @@ const {
   updateTicketStatusValidation
 } = require("../validation/ticketValidation");
 
-// USER ROUTES
+// ---------------- USER ROUTES ----------------
 
-// Join a queue
+// Join queue
 router.post("/join", protect, joinQueueValidation, joinQueue);
 
-// Get my position in a queue
+// Check queue position
 router.get("/position/:queueId", protect, getPosition);
 
-// Cancel my ticket
+// Cancel ticket
 router.delete("/cancel/:ticketId", protect, cancelTicket);
 
-// Get all tickets of logged-in user
+// Get my tickets
 router.get("/my-tickets", protect, getMyTickets);
 
-// ADMIN ROUTES
 
-// Get all tickets in the system
+// ---------------- ADMIN ROUTES ----------------
+
+// Get all tickets in a queue
 router.get("/all", protect, isAdmin, getAllTickets);
 
-// Update ticket status (serving, completed, cancelled)
+// Update ticket status
 router.patch(
   "/:ticketId/status",
   protect,
