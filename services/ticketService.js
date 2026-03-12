@@ -1,16 +1,19 @@
 
+// services/ticketService.js
 const Ticket = require("../models/Ticket");
 const Queue = require("../models/Queue");
 
+// User Services  //
+
 // JOIN QUEUE
 const joinQueueService = async (userId, queueId) => {
-
   const queue = await Queue.findById(queueId);
 
   if (!queue) {
     throw new Error("Queue not found");
   }
 
+  // Count waiting tickets
   const waitingCount = await Ticket.countDocuments({
     queue: queueId,
     status: "waiting"
@@ -20,6 +23,7 @@ const joinQueueService = async (userId, queueId) => {
     throw new Error("Queue is full");
   }
 
+  // Check if user already has a ticket
   const existingTicket = await Ticket.findOne({
     user: userId,
     queue: queueId,
@@ -30,6 +34,7 @@ const joinQueueService = async (userId, queueId) => {
     throw new Error("User already in this queue");
   }
 
+  // Increment current token
   const updatedQueue = await Queue.findByIdAndUpdate(
     queueId,
     { $inc: { currentToken: 1 } },
@@ -47,10 +52,8 @@ const joinQueueService = async (userId, queueId) => {
   return ticket;
 };
 
-
 // GET QUEUE POSITION
 const getQueuePosition = async (queueId, userId) => {
-
   const ticket = await Ticket.findOne({
     queue: queueId,
     user: userId,
@@ -74,10 +77,42 @@ const getQueuePosition = async (queueId, userId) => {
     peopleAhead,
     waitTime
   };
+};
 
+// GET ALL TICKETS OF LOGGED-IN USER
+const getUserTicketsService = async (userId) => {
+  return await Ticket.find({ user: userId }).populate("queue", "name location");
+};
+
+//  Admin Services  //
+
+// GET ALL TICKETS IN A QUEUE
+const getTicketsByQueueService = async (queueId) => {
+  return await Ticket.find({ queue: queueId }).populate("user", "name email");
+};
+
+// UPDATE TICKET STATUS
+const updateTicketStatusService = async (ticketId, status) => {
+  const ticket = await Ticket.findByIdAndUpdate(
+    ticketId,
+    { status },
+    { new: true }
+  );
+
+  if (!ticket) {
+    throw new Error("Ticket not found");
+  }
+
+  return ticket;
 };
 
 module.exports = {
+  // User services
   joinQueueService,
-  getQueuePosition
+  getQueuePosition,
+  getUserTicketsService,
+
+  // Admin services
+  getTicketsByQueueService,
+  updateTicketStatusService
 };
