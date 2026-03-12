@@ -9,6 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const queueRoutes = require("./routes/queueRoutes");
 const ticketRoutes = require("./routes/ticketRoutes");
+const errorHandler = require("./validation/errorMiddleware");
 
 dotenv.config();
 connectDB();
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/queues", queueRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use(errorHandler);
 
 app.get("/", (req, res) => {
   res.send("Server is running!");
