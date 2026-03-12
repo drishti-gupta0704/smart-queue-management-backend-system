@@ -1,46 +1,46 @@
 
 const express = require("express");
 const router = express.Router();
-const { body, param } = require("express-validator");
 
 const protect = require("../middleware/authMiddleware");
 const isAdmin = require("../middleware/roleMiddleware");
+
 const {
   joinQueue,
   getPosition,
   cancelTicket,
   getAllTickets,
-  getMyTickets
+  getMyTickets,
+  updateTicketStatus
 } = require("../controllers/ticketController");
 
+const {
+  joinQueueValidation,
+  updateTicketStatusValidation
+} = require("../validation/ticketValidation");
+
 // JOIN QUEUE
-router.post(
-  "/join",
-  protect,
-  body("queueId", "Queue ID is required").notEmpty(),
-  joinQueue
-);
+router.post("/join", protect, joinQueueValidation, joinQueue);
 
 // GET QUEUE POSITION
-router.get(
-  "/position/:queueId",
-  protect,
-  param("queueId", "Queue ID is required").notEmpty(),
-  getPosition
-);
+router.get("/position/:queueId", protect, getPosition);
 
 // CANCEL TICKET
-router.delete(
-  "/cancel/:ticketId",
-  protect,
-  param("ticketId", "Ticket ID is required").notEmpty(),
-  cancelTicket
-);
+router.delete("/cancel/:ticketId", protect, cancelTicket);
 
 // USER: Get my tickets
 router.get("/my-tickets", protect, getMyTickets);
 
 // ADMIN: Get all tickets
 router.get("/all", protect, isAdmin, getAllTickets);
+
+// ADMIN: Update ticket status
+router.patch(
+  "/:ticketId/status",
+  protect,
+  isAdmin,
+  updateTicketStatusValidation,
+  updateTicketStatus
+);
 
 module.exports = router;
