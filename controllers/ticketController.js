@@ -7,13 +7,17 @@ const {
   updateTicketStatusService
 } = require("../services/ticketService");
 
-// User APIs  //
+// ----------- User APIs -----------
 
 // JOIN QUEUE (User)
 const joinQueue = async (req, res) => {
   try {
     const { queueId } = req.body;
     const ticket = await joinQueueService(req.user._id, queueId);
+
+    // Emit event for real-time update
+    const io = req.app.get("io");
+    io.emit("ticketJoined", { queueId, ticket });
 
     res.status(201).json({
       message: "Joined queue successfully",
@@ -44,6 +48,10 @@ const cancelTicket = async (req, res) => {
     const { ticketId } = req.params;
     const ticket = await updateTicketStatusService(ticketId, "cancelled");
 
+    // Emit event for real-time update
+    const io = req.app.get("io");
+    io.emit("ticketCancelled", { queueId: ticket.queue, ticket });
+
     res.status(200).json({
       message: "Ticket cancelled successfully",
       ticket
@@ -63,7 +71,7 @@ const getMyTickets = async (req, res) => {
   }
 };
 
-// Admin APIs //
+// ----------- Admin APIs -----------
 
 // GET ALL TICKETS IN A QUEUE (Admin)
 const getAllTickets = async (req, res) => {
@@ -85,6 +93,10 @@ const updateTicketStatus = async (req, res) => {
     const { status } = req.body;
 
     const ticket = await updateTicketStatusService(ticketId, status);
+
+    // Emit event for real-time update
+    const io = req.app.get("io");
+    io.emit("ticketStatusUpdated", { queueId: ticket.queue, ticket });
 
     res.status(200).json({
       message: "Ticket status updated successfully",
