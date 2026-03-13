@@ -7,15 +7,15 @@ const {
   updateTicketStatusService
 } = require("../services/ticketService");
 
-// ----------- User APIs -----------
+// ---------------- User APIs ----------------
 
-// JOIN QUEUE (User)
+// JOIN QUEUE
 const joinQueue = async (req, res) => {
   try {
     const { queueId } = req.body;
     const ticket = await joinQueueService(req.user._id, queueId);
 
-    // Emit event for real-time update
+    // Emit Socket.IO event
     const io = req.app.get("io");
     io.emit("ticketJoined", { queueId, ticket });
 
@@ -28,7 +28,7 @@ const joinQueue = async (req, res) => {
   }
 };
 
-// GET QUEUE POSITION (User)
+// GET QUEUE POSITION
 const getPosition = async (req, res) => {
   try {
     const { queueId } = req.params;
@@ -42,13 +42,13 @@ const getPosition = async (req, res) => {
   }
 };
 
-// CANCEL TICKET (User)
+// CANCEL TICKET
 const cancelTicket = async (req, res) => {
   try {
     const { ticketId } = req.params;
     const ticket = await updateTicketStatusService(ticketId, "cancelled");
 
-    // Emit event for real-time update
+    // Emit event
     const io = req.app.get("io");
     io.emit("ticketCancelled", { queueId: ticket.queue, ticket });
 
@@ -61,7 +61,7 @@ const cancelTicket = async (req, res) => {
   }
 };
 
-// GET ALL TICKETS OF LOGGED-IN USER
+// GET MY TICKETS
 const getMyTickets = async (req, res) => {
   try {
     const tickets = await getUserTicketsService(req.user._id);
@@ -71,9 +71,9 @@ const getMyTickets = async (req, res) => {
   }
 };
 
-// ----------- Admin APIs -----------
+// ---------------- Admin APIs ----------------
 
-// GET ALL TICKETS IN A QUEUE (Admin)
+// GET ALL TICKETS IN A QUEUE
 const getAllTickets = async (req, res) => {
   try {
     const { queueId } = req.query;
@@ -86,7 +86,7 @@ const getAllTickets = async (req, res) => {
   }
 };
 
-// UPDATE TICKET STATUS (Admin)
+// UPDATE TICKET STATUS
 const updateTicketStatus = async (req, res) => {
   try {
     const { ticketId } = req.params;
@@ -94,9 +94,9 @@ const updateTicketStatus = async (req, res) => {
 
     const ticket = await updateTicketStatusService(ticketId, status);
 
-    // Emit event for real-time update
+    // Emit event
     const io = req.app.get("io");
-    io.emit("ticketStatusUpdated", { queueId: ticket.queue, ticket });
+    io.emit("ticketUpdated", { queueId: ticket.queue, ticket });
 
     res.status(200).json({
       message: "Ticket status updated successfully",
@@ -115,4 +115,3 @@ module.exports = {
   getAllTickets,
   updateTicketStatus
 };
-
