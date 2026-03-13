@@ -13,7 +13,7 @@ const {
   getMyTickets,
   getAllTickets,
   updateTicketStatus
-} = require("../controllers/ticketController");
+} = require("../controllers/ticketController"); 
 
 const {
   joinQueueValidation,
@@ -32,7 +32,7 @@ router.get("/position/:queueId", protect, getPosition);
 router.delete("/cancel/:ticketId", protect, cancelTicket);
 
 // Get my tickets
-router.get("/my-tickets", protect, getMyTickets);
+router.get("/my-tickets", protect, getMyTickets); 
 
 
 // ---------------- ADMIN ROUTES ----------------
@@ -49,4 +49,5 @@ router.patch(
   updateTicketStatus
 );
 
-module.exports = router;
+module.exports = router; 
+
