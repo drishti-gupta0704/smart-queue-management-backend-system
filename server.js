@@ -20,7 +20,30 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Routes
+// Creating HTTP server and Socket.IO 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*", // i can restrict this to my frontend URL later
+    methods: ["GET", "POST", "PATCH", "DELETE"]
+  }
+});
+
+// Store io instance in app for controllers
+app.set("io", io);
+
+// Socket.IO connection listener
+io.on("connection", (socket) => {
+  console.log("New client connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+  });
+});
+
+
+//routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/queues", queueRoutes);
@@ -28,22 +51,13 @@ app.use("/api/tickets", ticketRoutes);
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("Server is running!");
+  res.send("Server is running with Socket.IO!");
 });
 
 // Error middleware (keep it after all routes)
 app.use(errorHandler);
 
-// Create HTTP server and attach Socket.IO
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: "*" } // allow all origins for now
-});
-
-// Make io accessible in controllers
-app.set("io", io);
-
-
-server.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
