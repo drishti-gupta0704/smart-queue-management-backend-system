@@ -6,7 +6,7 @@ const Queue = require("../models/Queue");
 // User Services  //
 
 // JOIN QUEUE
-const joinQueueService = async (userId, queueId) => {
+const joinQueueService = async (userId, queueId, io = null) => {
   const queue = await Queue.findById(queueId);
 
   if (!queue) {
@@ -49,6 +49,9 @@ const joinQueueService = async (userId, queueId) => {
     tokenNumber
   });
 
+  // Emit real-time event
+  if (io) io.emit("ticketJoined", { ticket, queueId });
+
   return ticket;
 };
 
@@ -84,7 +87,7 @@ const getUserTicketsService = async (userId) => {
   return await Ticket.find({ user: userId }).populate("queue", "name location");
 };
 
-//  Admin Services  //
+// Admin Services  //
 
 // GET ALL TICKETS IN A QUEUE
 const getTicketsByQueueService = async (queueId) => {
@@ -92,7 +95,7 @@ const getTicketsByQueueService = async (queueId) => {
 };
 
 // UPDATE TICKET STATUS
-const updateTicketStatusService = async (ticketId, status) => {
+const updateTicketStatusService = async (ticketId, status, io = null) => {
   const ticket = await Ticket.findByIdAndUpdate(
     ticketId,
     { status },
@@ -101,6 +104,15 @@ const updateTicketStatusService = async (ticketId, status) => {
 
   if (!ticket) {
     throw new Error("Ticket not found");
+  }
+
+  // Emit events for real-time update
+  if (io) {
+    if (status === "cancelled") {
+      io.emit("ticketCancelled", { ticket, queueId: ticket.queue });
+    } else {
+      io.emit("ticketUpdated", { ticket, queueId: ticket.queue });
+    }
   }
 
   return ticket;
