@@ -54,7 +54,7 @@ app.get("/", (req, res) => {
   res.send("Server is running with Socket.IO!");
 });
 
-// Error middleware (keep it after all routes)
+// Error middleware 
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
