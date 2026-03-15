@@ -47,3 +47,51 @@ async function registerUser() {
   }
 
 }
+
+
+// LOGIN USER
+async function loginUser() {
+
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  try {
+
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+
+      // Save token
+      localStorage.setItem("token", data.token);
+
+      // Save role
+      localStorage.setItem("role", data.user.role);
+
+      alert("Login successful!");
+
+      if (data.user.role === "admin") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+
+    } else {
+      alert(data.message);
+    }
+
+  } catch (error) {
+    console.error("Login error:", error);
+  }
+
+}
