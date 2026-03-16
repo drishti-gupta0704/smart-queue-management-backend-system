@@ -83,3 +83,6 @@ async function updateTicketStatus(ticketId) {
   alert(data.message);
   fetchAllTickets();
 }
+
+
+fetchAllTickets();
