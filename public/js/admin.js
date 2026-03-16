@@ -64,3 +64,22 @@ async function fetchAllTickets() {
     });
   }
 }
+
+
+
+async function updateTicketStatus(ticketId) {
+  const status = document.getElementById(`status-${ticketId}`).value;
+
+  const res = await fetch(`${API_URL}/tickets/${ticketId}`, {
+    method: "PATCH",
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+  fetchAllTickets();
+}
