@@ -39,3 +39,6 @@ async function cancelTicket(ticketId) {
   alert(data.message);
   fetchTickets();
 }
+
+
+fetchTickets();
