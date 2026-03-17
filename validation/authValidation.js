@@ -1,6 +1,6 @@
 
 const { body, validationResult } = require("express-validator");
-
+//body checks the error and validationResult collects the error
 const registerValidation = [
   body("name")
     .notEmpty()

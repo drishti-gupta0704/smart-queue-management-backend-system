@@ -28,3 +28,14 @@ async function fetchTickets() {
     container.appendChild(div);
   });
 }
+
+
+async function cancelTicket(ticketId) {
+  const res = await fetch(`${API_URL}/tickets/cancel/${ticketId}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  alert(data.message);
+  fetchTickets();
+}
