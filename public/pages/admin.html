@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+
+  <div id="createQueue">
+    <h2>Create Queue</h2>
+    <input type="text" id="queueName" placeholder="Queue Name"><br>
+    <input type="text" id="queueLocation" placeholder="Location"><br>
+    <input type="number" id="queueMaxSize" placeholder="Max Size"><br>
+    <button id="createQueueBtn">Create Queue</button>
+  </div>
+
+  <div id="ticketsList">
+    <h2>Tickets</h2>
+    <div id="tickets"></div>
+  </div>
+
+  <script src="../js/admin.js"></script>
+</body>
+</html>
