@@ -29,3 +29,18 @@ async function fetchQueues() {
     container.appendChild(div);
   });
 }
+
+
+async function joinQueue(queueId) {
+  const res = await fetch(`${API_URL}/tickets/join`, {
+    method: "POST",
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ queueId })
+  });
+  const data = await res.json();
+  alert(data.message);
+  fetchQueues();
+}
