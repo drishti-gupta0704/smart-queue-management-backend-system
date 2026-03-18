@@ -44,3 +44,9 @@ async function joinQueue(queueId) {
   alert(data.message);
   fetchQueues();
 }
+
+fetchQueues();
+
+// Real-time updates
+socket.on("ticketJoined", data => fetchQueues());
+socket.on("ticketCancelled", data => fetchQueues());
