@@ -70,20 +70,25 @@ async function loginUser() {
 
     const data = await response.json();
 
+    console.log("Login response:", data); 
     if (response.ok) {
 
-      // Save token
       localStorage.setItem("token", data.token);
 
-      // Save role
-      localStorage.setItem("role", data.user.role);
+      // ✅ SAFE CHECK
+      if (data.user) {
+        localStorage.setItem("role", data.user.role);
 
-      alert("Login successful!");
+        alert("Login successful!");
 
-      if (data.user.role === "admin") {
-        window.location.href = "admin.html";
+        if (data.user.role === "admin") {
+          window.location.href = "admin.html";
+        } else {
+          window.location.href = "dashboard.html";
+        }
+
       } else {
-        window.location.href = "dashboard.html";
+        alert("User data missing in response");
       }
 
     } else {
