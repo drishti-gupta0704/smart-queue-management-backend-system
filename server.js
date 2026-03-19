@@ -1,5 +1,6 @@
 
 const express = require("express");
+const app = express(); //
 const dotenv = require("dotenv");
 const cors = require("cors");
 const http = require("http");
@@ -13,10 +14,12 @@ const queueRoutes = require("./routes/queueRoutes");
 const ticketRoutes = require("./routes/ticketRoutes");
 const errorHandler = require("./validation/errorMiddleware");
 
+app.use(express.static("public")); //
+
 dotenv.config();
 connectDB();
 
-const app = express();
+// const app = express();
 app.use(express.json());
 app.use(cors());
 
@@ -50,9 +53,13 @@ app.use("/api/queues", queueRoutes);
 app.use("/api/tickets", ticketRoutes);
 
 // Root route
+// app.get("/", (req, res) => {
+//   res.send("Server is running with Socket.IO!");
+// });
+
 app.get("/", (req, res) => {
-  res.send("Server is running with Socket.IO!");
-});
+  res.sendFile(__dirname + "/public/pages/index.html");
+}); //
 
 // Error middleware 
 app.use(errorHandler);
