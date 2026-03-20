@@ -1,8 +1,19 @@
 
-const token = localStorage.getItem("token");
-const API_URL = "http://localhost:4000/api";
+// public/js/admin.js
 
-document.getElementById("createQueueBtn").addEventListener("click", createQueue);
+const API_URL = "http://localhost:4000/api";
+const token = localStorage.getItem("token");
+const userString = localStorage.getItem("user");
+const user = userString ? JSON.parse(userString) : null;
+
+// Redirect if not logged in or not admin
+if (!token || !user || user.role !== "admin") {
+  alert("Access denied. Admins only.");
+  window.location.href = "index.html";
+}
+
+// Create queue
+document.getElementById("createQueueBtn")?.addEventListener("click", createQueue);
 
 async function createQueue() {
   const name = document.getElementById("queueName").value;
@@ -23,9 +34,7 @@ async function createQueue() {
   fetchAllTickets();
 }
 
-
-
-
+// Fetch all tickets
 async function fetchAllTickets() {
   const queuesRes = await fetch(`${API_URL}/queues`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -55,8 +64,10 @@ async function fetchAllTickets() {
       updateBtn.textContent = "Update";
       updateBtn.addEventListener("click", () => updateTicketStatus(t._id));
 
+      const userName = t.user?.name || "Unknown User";
+
       div.innerHTML = `<h4>Queue: ${q.name}</h4>
-                       <p>User: ${t.user.name} | Token: ${t.tokenNumber} | Status:</p>`;
+                       <p>User: ${userName} | Token: ${t.tokenNumber} | Status:</p>`;
       div.appendChild(select);
       div.appendChild(updateBtn);
       div.appendChild(document.createElement("hr"));
@@ -65,11 +76,9 @@ async function fetchAllTickets() {
   }
 }
 
-
-
+// Update ticket status
 async function updateTicketStatus(ticketId) {
   const status = document.getElementById(`status-${ticketId}`).value;
-
   const res = await fetch(`${API_URL}/tickets/${ticketId}`, {
     method: "PATCH",
     headers: { 
@@ -78,11 +87,10 @@ async function updateTicketStatus(ticketId) {
     },
     body: JSON.stringify({ status })
   });
-
   const data = await res.json();
   alert(data.message);
   fetchAllTickets();
 }
 
-
+// Initial fetch
 fetchAllTickets();
