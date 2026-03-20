@@ -1,23 +1,12 @@
 
-// public/js/tickets.js
-
-const API_URL = "http://localhost:4000/api";
 const token = localStorage.getItem("token");
-const userString = localStorage.getItem("user");
-const user = userString ? JSON.parse(userString) : null;
+const API_URL = "http://localhost:4000/api";
 
-// Redirect if not logged in
-if (!token || !user) {
-  alert("Please login first");
-  window.location.href = "index.html";
-}
-
-// Back to dashboard
-document.getElementById("backBtn")?.addEventListener("click", () => {
+document.getElementById("backBtn").addEventListener("click", () => {
   window.location.href = "dashboard.html";
 });
 
-// Fetch user tickets
+
 async function fetchTickets() {
   const res = await fetch(`${API_URL}/tickets/my-tickets`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -32,28 +21,25 @@ async function fetchTickets() {
     cancelBtn.textContent = "Cancel Ticket";
     cancelBtn.addEventListener("click", () => cancelTicket(t._id));
 
-    const queueName = t.queue?.name || "Unknown Queue";
-    const tokenNumber = t.tokenNumber || "-";
-    const status = t.status || "waiting";
-
-    div.innerHTML = `<h3>${queueName}</h3>
-                     <p>Token: ${tokenNumber} | Status: ${status}</p>`;
+    div.innerHTML = `<h3>${t.queue.name}</h3>
+                     <p>Token: ${t.tokenNumber} | Status: ${t.status}</p>`;
     div.appendChild(cancelBtn);
     div.appendChild(document.createElement("hr"));
     container.appendChild(div);
   });
 }
 
-// Cancel ticket
+
 async function cancelTicket(ticketId) {
   const res = await fetch(`${API_URL}/tickets/cancel/${ticketId}`, {
-    method: "PATCH",
+    method: "DELETE", 
     headers: { Authorization: `Bearer ${token}` }
   });
+
   const data = await res.json();
   alert(data.message);
   fetchTickets();
 }
 
-// Initial fetch
+
 fetchTickets();

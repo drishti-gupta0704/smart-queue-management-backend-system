@@ -1,32 +1,13 @@
 
-// public/js/dashboard.js
-
-const API_URL = "http://localhost:4000/api";
 const token = localStorage.getItem("token");
-const userString = localStorage.getItem("user");
-const user = userString ? JSON.parse(userString) : null;
-
-// Redirect if not logged in
-if (!token || !user) {
-  alert("Please login first");
-  window.location.href = "index.html";
-}
-
-// Real-time setup
+const API_URL = "http://localhost:4000/api";
 const socket = io("http://localhost:4000");
 
-// Display welcome message if you have element
-document.addEventListener("DOMContentLoaded", () => {
-  const welcomeEl = document.getElementById("welcomeMsg");
-  if (welcomeEl) welcomeEl.textContent = `Welcome, ${user.name}`;
-});
-
-// Go to My Tickets page
-document.getElementById("myTicketsBtn")?.addEventListener("click", () => {
+document.getElementById("myTicketsBtn").addEventListener("click", () => {
   window.location.href = "mytickets.html";
 });
 
-// Fetch and display all queues
+
 async function fetchQueues() {
   const res = await fetch(`${API_URL}/queues`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -49,25 +30,34 @@ async function fetchQueues() {
   });
 }
 
-// Join a queue
+
 async function joinQueue(queueId) {
+  console.log("Queue ID:", queueId);
+
   const res = await fetch(`${API_URL}/tickets/join`, {
     method: "POST",
-    headers: { 
+    headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     },
     body: JSON.stringify({ queueId })
   });
 
-  const data = await res.json();
+  const text = await res.text();   
+  console.log("Response:", text);
+
+  const data = JSON.parse(text);   
+  if (!res.ok) {
+    alert(data.message || "Failed to join queue");
+    return;
+  }
+
   alert(data.message);
   fetchQueues();
 }
 
-// Initial fetch
 fetchQueues();
 
 // Real-time updates
-socket.on("ticketJoined", () => fetchQueues());
-socket.on("ticketCancelled", () => fetchQueues());
+socket.on("ticketJoined", data => fetchQueues());
+socket.on("ticketCancelled", data => fetchQueues());
