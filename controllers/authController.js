@@ -1,27 +1,24 @@
 
-// registerUser
-// loginUser
-
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/jwt");
 
-// REGISTER USER
+
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // checking if user already exists
+    
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // hash password
+   
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // create user
+  
     const user = await User.create({
       name,
       email,
@@ -44,26 +41,24 @@ const registerUser = async (req, res) => {
 };
 
 
-// LOGIN USER
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // find user
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // compare password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // generate token
+
     const token = generateToken(user); //changed it from user.id to user
 
     res.status(200).json({
@@ -86,4 +81,4 @@ const loginUser = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser
-};
+};  
